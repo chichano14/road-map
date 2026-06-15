@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>あなただけのダイエットナビ</title>
+<style>
+:root{
+  --primary:#4F8EF7;
+  --primary-dark:#3A7AE4;
+  --primary-light:#EBF2FF;
+  --accent:#FF7043;
+  --accent-light:#FFF0EC;
+  --green:#43A884;
+  --green-light:#E8F7F2;
+  --yellow:#F5A623;
+  --yellow-light:#FFF8EC;
+  --purple:#8A6BBE;
+  --purple-light:#F0ECFA;
+  --bg:#F5F7FA;
+  --card:#FFFFFF;
+  --text:#1A1A2E;
+  --text-sub:#6B7280;
+  --border:#E5E7EB;
+  --shadow:0 4px 20px rgba(0,0,0,0.08);
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Hiragino Sans','Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.7;}
+
+/* ===== ヘッダー ===== */
+header{background:linear-gradient(135deg,var(--primary) 0%,#6C63FF 100%);color:#fff;padding:36px 20px 28px;text-align:center;}
+header .app-name{font-size:11px;font-weight:700;letter-spacing:.15em;opacity:.85;text-transform:uppercase;margin-bottom:8px;}
+header h1{font-size:clamp(20px,5vw,28px);font-weight:800;margin-bottom:8px;letter-spacing:-.02em;}
+header p{font-size:13px;opacity:.85;max-width:480px;margin:0 auto;}
+
+/* ===== ステップナビ ===== */
+.step-nav{display:flex;justify-content:center;gap:0;padding:16px 20px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06);}
+.step-dot{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1;max-width:80px;cursor:default;}
+.step-dot .dot{width:32px;height:32px;border-radius:50%;background:var(--border);color:var(--text-sub);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .3s;position:relative;}
+.step-dot.active .dot{background:var(--primary);color:#fff;box-shadow:0 0 0 4px var(--primary-light);}
+.step-dot.done .dot{background:var(--green);color:#fff;}
+.step-dot .dot-label{font-size:10px;color:var(--text-sub);text-align:center;line-height:1.3;}
+.step-dot.active .dot-label{color:var(--primary);font-weight:700;}
+.step-connector{flex:1;height:2px;background:var(--border);align-self:center;margin-bottom:18px;transition:background .3s;max-width:30px;}
+.step-connector.done{background:var(--green);}
+
+/* ===== メイン ===== */
+main{max-width:680px;margin:0 auto;padding:24px 16px 80px;}
+
+/* ===== ページ（表示切替） ===== */
+.page{display:none;}
+.page.active{display:block;}
+
+/* ===== カード ===== */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:20px;}
+.card-title{font-size:18px;font-weight:800;margin-bottom:6px;}
+.card-sub{font-size:13px;color:var(--text-sub);margin-bottom:20px;}
+
+/* ===== セクションタイトル ===== */
+.sec-title{font-size:11px;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:.1em;margin:20px 0 10px;}
+
+/* ===== 診断質問 ===== */
+.q-block{margin-bottom:24px;}
+.q-text{font-size:15px;font-weight:700;margin-bottom:12px;line-height:1.5;}
+.q-options{display:flex;flex-direction:column;gap:8px;}
+.q-opt{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:2px solid var(--border);background:#fff;cursor:pointer;transition:all .2s;font-size:14px;-webkit-tap-highlight-color:transparent;}
+.q-opt:hover{border-color:var(--primary);background:var(--primary-light);}
+.q-opt.selected{border-color:var(--primary);background:var(--primary-light);font-weight:600;color:var(--primary);}
+.q-opt .opt-icon{font-size:20px;flex-shrink:0;}
+
+/* ===== タイプ結果カード ===== */
+.type-result{border-radius:var(--radius);padding:20px;margin-bottom:20px;border:2px solid transparent;}
+.type-result.type-A{background:var(--accent-light);border-color:#FFCCBC;}
+.type-result.type-B{background:var(--green-light);border-color:#B2DFDB;}
+.type-result.type-C{background:var(--yellow-light);border-color:#FFE0B2;}
+.type-result.type-D{background:var(--purple-light);border-color:#D1C4E9;}
+.type-badge{display:inline-block;border-radius:20px;padding:4px 14px;font-size:12px;font-weight:700;margin-bottom:10px;}
+.type-A .type-badge{background:var(--accent);color:#fff;}
+.type-B .type-badge{background:var(--green);color:#fff;}
+.type-C .type-badge{background:var(--yellow);color:#fff;}
+.type-D .type-badge{background:var(--purple);color:#fff;}
+.type-name{font-size:20px;font-weight:800;margin-bottom:8px;}
+.type-desc{font-size:13px;color:var(--text-sub);line-height:1.7;}
+
+/* ===== 入力フォーム ===== */
+.form-group{margin-bottom:16px;}
+.form-label{font-size:13px;font-weight:700;color:var(--text-sub);margin-bottom:6px;display:block;}
+.form-input{width:100%;padding:12px 14px;border-radius:10px;border:2px solid var(--border);font-size:16px;transition:border .2s;background:#fff;color:var(--text);}
+.form-input:focus{outline:none;border-color:var(--primary);background:var(--primary-light);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.radio-group{display:flex;gap:10px;}
+.radio-btn{flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:#fff;text-align:center;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+.radio-btn.selected{border-color:var(--primary);background:var(--primary-light);color:var(--primary);}
+
+/* ===== 計算結果 ===== */
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
+.calc-box{border-radius:12px;padding:16px;text-align:center;}
+.calc-box.cal{background:var(--accent-light);}
+.calc-box.protein{background:var(--primary-light);}
+.calc-box.fat{background:var(--yellow-light);}
+.calc-box.carb{background:var(--green-light);}
+.calc-box .cb-label{font-size:11px;font-weight:700;color:var(--text-sub);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;}
+.calc-box .cb-val{font-size:clamp(22px,5vw,30px);font-weight:800;line-height:1;}
+.calc-box .cb-unit{font-size:12px;color:var(--text-sub);margin-top:2px;}
+.calc-box.cal .cb-val{color:var(--accent);}
+.calc-box.protein .cb-val{color:var(--primary);}
+.calc-box.fat .cb-val{color:var(--yellow);}
+.calc-box.carb .cb-val{color:var(--green);}
+
+.meal-card{background:var(--bg);border-radius:12px;padding:14px 16px;margin-bottom:10px;}
+.meal-title{font-size:13px;font-weight:700;color:var(--text-sub);margin-bottom:8px;}
+.meal-items{display:flex;flex-wrap:wrap;gap:6px;}
+.meal-tag{background:#fff;border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;}
+
+/* ===== 継続ヒント ===== */
+.hint-tabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch;}
+.hint-tab{flex-shrink:0;padding:8px 16px;border-radius:20px;border:2px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;background:#fff;-webkit-tap-highlight-color:transparent;}
+.hint-tab.active{background:var(--primary);border-color:var(--primary);color:#fff;}
+.hint-content{display:none;}
+.hint-content.active{display:block;}
+.hint-item{display:flex;gap:12px;padding:14px;border-radius:12px;background:var(--bg);margin-bottom:10px;align-items:flex-start;}
+.hint-icon{font-size:22px;flex-shrink:0;margin-top:2px;}
+.hint-text strong{display:block;font-size:14px;font-weight:700;margin-bottom:3px;}
+.hint-text span{font-size:13px;color:var(--text-sub);line-height:1.6;}
+
+/* ===== やることリスト ===== */
+.todo-section{margin-bottom:20px;}
+.todo-sec-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.todo-sec-icon{font-size:18px;}
+.todo-sec-title{font-size:14px;font-weight:700;}
+.todo-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-radius:10px;background:var(--bg);margin-bottom:8px;cursor:pointer;transition:background .2s;-webkit-tap-highlight-color:transparent;}
+.todo-item:hover{background:#E8F0FE;}
+.todo-item.done-item{background:var(--green-light);}
+.todo-check{flex-shrink:0;width:22px;height:22px;border-radius:6px;border:2px solid var(--border);background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all .2s;margin-top:1px;}
+.todo-item.done-item .todo-check{background:var(--green);border-color:var(--green);color:#fff;}
+.todo-item.done-item .todo-label{text-decoration:line-through;color:var(--text-sub);}
+.todo-label{font-size:13.5px;line-height:1.6;}
+.todo-freq{flex-shrink:0;font-size:10px;font-weight:700;color:var(--text-sub);background:var(--border);border-radius:20px;padding:2px 8px;margin-top:3px;white-space:nowrap;}
+
+/* ===== 進捗ドーナツ ===== */
+.progress-ring-wrap{display:flex;justify-content:center;margin:16px 0;}
+.progress-ring-wrap svg{transform:rotate(-90deg);}
+.progress-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;}
+.ring-container{position:relative;display:inline-block;}
+.ring-pct{font-size:24px;font-weight:800;color:var(--primary);}
+.ring-label{font-size:11px;color:var(--text-sub);}
+
+/* ===== ボタン ===== */
+.btn{display:block;width:100%;padding:15px;border-radius:12px;font-size:16px;font-weight:700;border:none;cursor:pointer;transition:all .2s;-webkit-tap-highlight-color:transparent;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#6C63FF);color:#fff;}
+.btn-primary:hover{opacity:.9;}
+.btn-primary:active{transform:scale(.98);}
+.btn-secondary{background:var(--bg);color:var(--primary);border:2px solid var(--primary);}
+.btn-accent{background:linear-gradient(135deg,var(--accent),#FF5722);color:#fff;}
+.btn:disabled{background:var(--border);color:var(--text-sub);cursor:not-allowed;transform:none;}
+.btn-row{display:flex;gap:10px;}
+.btn-row .btn{flex:1;}
+
+/* ===== 完了バナー ===== */
+.done-banner{background:linear-gradient(135deg,var(--green),#2E7D32);color:#fff;border-radius:var(--radius);padding:32px 24px;text-align:center;margin-bottom:20px;}
+.done-banner h2{font-size:22px;margin-bottom:8px;}
+.done-banner p{font-size:13px;opacity:.9;}
+
+/* ===== フッター ===== */
+footer{text-align:center;padding:20px;font-size:12px;color:var(--text-sub);}
+
+/* ===== レスポンシブ ===== */
+@media(max-width:480px){
+  header{padding:28px 16px 22px;}
+  main{padding:16px 12px 80px;}
+  .card{padding:18px 16px;}
+  .form-row{grid-template-columns:1fr;}
+  .calc-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="app-name">🥗 Diet Navi</div>
+  <h1>あなただけのダイエットナビ</h1>
+  <p>4ステップで、あなたに合った方法を見つけよう</p>
+</header>
+
+<!-- ステップナビ -->
+<div class="step-nav">
+  <div class="step-dot active" id="nav1"><div class="dot">1</div><div class="dot-label">タイプ<br>診断</div></div>
+  <div class="step-connector" id="con1"></div>
+  <div class="step-dot" id="nav2"><div class="dot">2</div><div class="dot-label">カロリー<br>計算</div></div>
+  <div class="step-connector" id="con2"></div>
+  <div class="step-dot" id="nav3"><div class="dot">3</div><div class="dot-label">継続<br>ヒント</div></div>
+  <div class="step-connector" id="con3"></div>
+  <div class="step-dot" id="nav4"><div class="dot">4</div><div class="dot-label">やること<br>リスト</div></div>
+</div>
+
+<main>
+
+<!-- ========== PAGE 1：タイプ診断 ========== -->
+<div class="page active" id="page1">
+  <div class="card">
+    <div class="card-title">🔍 あなたのタイプを診断</div>
+    <div class="card-sub">5つの質問に答えるだけで、あなたに合ったダイエット法がわかります</div>
+
+    <!-- Q1 -->
+    <div class="q-block" id="qb1">
+      <div class="q-text">Q1. 今まで一番やりがちだったダイエット法は？</div>
+      <div class="q-options">
+        <div class="q-opt" onclick="selectOpt(this,'q1','a')"><span class="opt-icon">🍚</span>ごはんや炭水化物を抜いた</div>
+        <div class="q-opt" onclick="selectOpt(this,'q1','b')"><span class="opt-icon">🏋️</span>とにかく運動を頑張った</div>
+        <div class="q-opt" onclick="selectOpt(this,'q1','c')"><span class="opt-icon">📊</span>カロリーを細かく計算した</div>
+        <div class="q-opt" onclick="selectOpt(this,'q1','d')"><span class="opt-icon">🌿</span>特定の食材だけを食べた</div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="q-block" id="qb2">
+      <div class="q-text">Q2. ダイエットで一番つらいのは？</div>
+      <div class="q-options">
+        <div class="q-opt" onclick="selectOpt(this,'q2','a')"><span class="opt-icon">🍫</span>甘いもの・お菓子の誘惑</div>
+        <div class="q-opt" onclick="selectOpt(this,'q2','b')"><span class="opt-icon">😴</span>疲れや忙しさで続かない</div>
+        <div class="q-opt" onclick="selectOpt(this,'q2','c')"><span class="opt-icon">📉</span>数字が動かない停滞期</div>
+        <div class="q-opt" onclick="selectOpt(this,'q2','d')"><span class="opt-icon">🍽️</span>外食や付き合いで崩れる</div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="q-block" id="qb3">
+      <div class="q-text">Q3. 自分の食生活として一番当てはまるのは？</div>
+      <div class="q-options">
+        <div class="q-opt" onclick="selectOpt(this,'q3','a')"><span class="opt-icon">🌙</span>夜に食べすぎてしまう</div>
+        <div class="q-opt" onclick="selectOpt(this,'q3','b')"><span class="opt-icon">⏩</span>食べる速度がとても速い</div>
+        <div class="q-opt" onclick="selectOpt(this,'q3','c')"><span class="opt-icon">🕐</span>食事の時間が不規則</div>
+        <div class="q-opt" onclick="selectOpt(this,'q3','d')"><span class="opt-icon">🧁</span>間食・お菓子が習慣化している</div>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="q-block" id="qb4">
+      <div class="q-text">Q4. 普段の活動量は？</div>
+      <div class="q-options">
+        <div class="q-opt" onclick="selectOpt(this,'q4','a')"><span class="opt-icon">🪑</span>ほぼ座り仕事・あまり動かない</div>
+        <div class="q-opt" onclick="selectOpt(this,'q4','b')"><span class="opt-icon">🚶</span>歩くことは多め（外回り・立ち仕事）</div>
+        <div class="q-opt" onclick="selectOpt(this,'q4','c')"><span class="opt-icon">🚴</span>週2〜3回は運動している</div>
+        <div class="q-opt" onclick="selectOpt(this,'q4','d')"><span class="opt-icon">🏃</span>ほぼ毎日体を動かしている</div>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="q-block" id="qb5">
+      <div class="q-text">Q5. ダイエットに対するスタンスは？</div>
+      <div class="q-options">
+        <div class="q-opt" onclick="selectOpt(this,'q5','a')"><span class="opt-icon">🔥</span>短期間で結果を出したい</div>
+        <div class="q-opt" onclick="selectOpt(this,'q5','b')"><span class="opt-icon">🐢</span>ゆっくりでいいから確実に痩せたい</div>
+        <div class="q-opt" onclick="selectOpt(this,'q5','c')"><span class="opt-icon">🔄</span>リバウンドを繰り返しているので根本から変えたい</div>
+        <div class="q-opt" onclick="selectOpt(this,'q5','d')"><span class="opt-icon">✨</span>見た目をスッキリさせたい（数字より体型）</div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="diagBtn" onclick="diagnose()" disabled>診断する →</button>
+  </div>
+</div>
+
+<!-- ========== PAGE 2：カロリー計算 ========== -->
+<div class="page" id="page2">
+  <!-- タイプ結果 -->
+  <div id="typeResultBox"></div>
+
+  <div class="card">
+    <div class="card-title">⚡ あなたの必要カロリーを計算</div>
+    <div class="card-sub">身体情報を入力して、1日の目標を自動で算出します</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">年齢</label>
+        <input class="form-input" type="number" id="inp-age" placeholder="例：30" min="10" max="90"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">性別</label>
+        <div class="radio-group">
+          <div class="radio-btn" id="rb-male" onclick="selectGender('male')">男性</div>
+          <div class="radio-btn" id="rb-female" onclick="selectGender('female')">女性</div>
+        </div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">身長（cm）</label>
+        <input class="form-input" type="number" id="inp-height" placeholder="例：160" min="100" max="230"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">体重（kg）</label>
+        <input class="form-input" type="number" id="inp-weight" placeholder="例：60" min="30" max="200"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">活動レベル</label>
+      <select class="form-input" id="inp-activity">
+        <option value="1.2">ほぼ座り仕事（運動なし）</option>
+        <option value="1.375">軽い運動（週1〜2回）</option>
+        <option value="1.55">適度な運動（週3〜5回）</option>
+        <option value="1.725">ハードな運動（週6〜7回）</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">目標（現体重から）</label>
+      <div class="radio-group" style="flex-wrap:wrap;gap:8px;">
+        <div class="radio-btn" id="rb-slow" onclick="selectGoal('slow')" style="flex:none;padding:8px 12px;">ゆっくり<br><span style="font-size:11px;font-weight:400">−0.3kg/週</span></div>
+        <div class="radio-btn" id="rb-mid" onclick="selectGoal('mid')" style="flex:none;padding:8px 12px;">標準<br><span style="font-size:11px;font-weight:400">−0.5kg/週</span></div>
+        <div class="radio-btn" id="rb-fast" onclick="selectGoal('fast')" style="flex:none;padding:8px 12px;">しっかり<br><span style="font-size:11px;font-weight:400">−0.75kg/週</span></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="calcBtn" onclick="calcCalorie()">計算する →</button>
+  </div>
+
+  <!-- 計算結果（非表示→表示） -->
+  <div class="card" id="calcResult" style="display:none;">
+    <div class="card-title">📊 あなたの1日の目標数値</div>
+    <div class="calc-grid">
+      <div class="calc-box cal"><div class="cb-label">目標カロリー</div><div class="cb-val" id="r-cal">—</div><div class="cb-unit">kcal</div></div>
+      <div class="calc-box protein"><div class="cb-label">たんぱく質</div><div class="cb-val" id="r-p">—</div><div class="cb-unit">g</div></div>
+      <div class="calc-box fat"><div class="cb-label">脂質</div><div class="cb-val" id="r-f">—</div><div class="cb-unit">g</div></div>
+      <div class="calc-box carb"><div class="cb-label">炭水化物</div><div class="cb-val" id="r-c">—</div><div class="cb-unit">g</div></div>
+    </div>
+
+    <div class="sec-title">🍽️ 1食あたりの目安</div>
+    <div class="meal-card">
+      <div class="meal-title">🌅 朝食</div>
+      <div class="meal-items" id="meal-morning"></div>
+    </div>
+    <div class="meal-card">
+      <div class="meal-title">☀️ 昼食</div>
+      <div class="meal-items" id="meal-lunch"></div>
+    </div>
+    <div class="meal-card">
+      <div class="meal-title">🌙 夕食</div>
+      <div class="meal-items" id="meal-dinner"></div>
+    </div>
+
+    <button class="btn btn-primary" style="margin-top:16px;" onclick="goPage(3)">継続のコツを見る →</button>
+  </div>
+</div>
+
+<!-- ========== PAGE 3：継続ヒント ========== -->
+<div class="page" id="page3">
+  <div class="card">
+    <div class="card-title">🔑 あなたに合った継続のコツ</div>
+    <div class="card-sub">タイプ別の弱点を攻略する4つの視点</div>
+
+    <div class="hint-tabs">
+      <div class="hint-tab active" onclick="switchTab(this,'tab-food')">🍱 食事</div>
+      <div class="hint-tab" onclick="switchTab(this,'tab-env')">🏠 環境</div>
+      <div class="hint-tab" onclick="switchTab(this,'tab-move')">🚶 動き</div>
+      <div class="hint-tab" onclick="switchTab(this,'tab-mind')">🧠 マインド</div>
+    </div>
+
+    <div class="hint-content active" id="tab-food">
+      <div class="hint-item"><div class="hint-icon">🍚</div><div class="hint-text"><strong>ご飯は抜かない</strong><span>炭水化物を抜くと夜の爆食いを招きます。毎食お茶碗1杯はしっかり食べましょう。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">🥩</div><div class="hint-text"><strong>たんぱく質を先に食べる</strong><span>肉・魚・卵・豆腐を最初に食べると満腹感が持続し、間食が自然に減ります。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">🧂</div><div class="hint-text"><strong>揚げ物・スナックの頻度を減らす</strong><span>「禁止」ではなく「週3回→週1回」に減らすだけ。小さな変化が大きな差になります。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">⏱️</div><div class="hint-text"><strong>よく噛んでゆっくり食べる</strong><span>満腹感は食べ始めて約15分後に届きます。一口ごとに箸を置く習慣が◎</span></div></div>
+    </div>
+
+    <div class="hint-content" id="tab-env">
+      <div class="hint-item"><div class="hint-icon">👁️</div><div class="hint-text"><strong>お菓子を「見えない場所」へ</strong><span>目に入るだけで手が伸びます。引き出しの奥にしまうか、買い置きをやめるだけで間食が激減します。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">🥗</div><div class="hint-text"><strong>冷蔵庫にすぐ食べられる食材を置く</strong><span>ゆでたまご・サラダチキン・カット野菜を常備すると、空腹時の選択が自然に変わります。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">🦷</div><div class="hint-text"><strong>食後すぐ歯を磨く</strong><span>「もう食事は終わり」という合図を脳に送ることで、だらだら食いを防げます。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">💧</div><div class="hint-text"><strong>水を1日1.5L飲む</strong><span>「空腹感」の正体が「喉の渇き」のことも。こまめな水分補給で偽の食欲を防ぎます。</span></div></div>
+    </div>
+
+    <div class="hint-content" id="tab-move">
+      <div class="hint-item"><div class="hint-icon">🪜</div><div class="hint-text"><strong>エレベーターの代わりに階段を使う</strong><span>特別な運動より「日常の動き（NEAT）」を増やす方が、1日の消費カロリーへの影響が大きいです。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">🧍</div><div class="hint-text"><strong>電子レンジの待ち時間に動く</strong><span>かかと上げ・スクワット・壁プッシュ。隙間の1分を積み重ねるだけで効果が出ます。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">🚶</div><div class="hint-text"><strong>1日の歩数を「今より＋1000歩」増やす</strong><span>1駅分歩く・少し遠いコンビニに行く。高い目標ではなく「今より少しだけ」がコツです。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">📺</div><div class="hint-text"><strong>テレビ中・スマホ中に体を動かす</strong><span>ストレッチ・プランク・ながらスクワット。「運動の時間」を取るより生活に溶け込ませましょう。</span></div></div>
+    </div>
+
+    <div class="hint-content" id="tab-mind">
+      <div class="hint-item"><div class="hint-icon">🎯</div><div class="hint-text"><strong>「毎日70点」を目標にする</strong><span>100点を目指すと1回の失敗で挫折します。70点を毎日積み重ねる方が3ヶ月後に圧倒的な差が出ます。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">📌</div><div class="hint-text"><strong>If-Thenルールを1つ作る</strong><span>「帰宅したら→まず水を1杯」「食べたくなったら→5分だけ気をそらす」と先に決めておくと迷いがなくなります。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">😴</div><div class="hint-text"><strong>睡眠を最優先にする</strong><span>寝不足は食欲を増やすホルモンを急増させます。24時までに布団に入るだけでダイエット効率が上がります。</span></div></div>
+      <div class="hint-item"><div class="hint-icon">📈</div><div class="hint-text"><strong>体重ではなく「行動」を記録する</strong><span>「今日3点セットの食事を食べた」など行動の達成を記録すると、モチベーションが長続きします。</span></div></div>
+    </div>
+
+    <div style="margin-top:24px;">
+      <button class="btn btn-primary" onclick="goPage(4)">やることリストを作成する →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== PAGE 4：やることリスト ========== -->
+<div class="page" id="page4">
+  <!-- 進捗リング -->
+  <div class="card" style="text-align:center;">
+    <div class="card-title">📋 あなたのやることリスト</div>
+    <div class="card-sub" id="todo-type-label"></div>
+    <div class="progress-ring-wrap">
+      <div class="ring-container">
+        <svg width="120" height="120" viewBox="0 0 120 120">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#E5E7EB" stroke-width="10"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#4F8EF7" stroke-width="10"
+            stroke-dasharray="314" stroke-dashoffset="314" id="ringCircle"
+            stroke-linecap="round"/>
+        </svg>
+        <div class="progress-center">
+          <div class="ring-pct" id="ringPct">0%</div>
+          <div class="ring-label">完了</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="todoContainer"></div>
+
+  <div class="card" id="doneBanner" style="display:none;">
+    <div class="done-banner">
+      <div style="font-size:48px;margin-bottom:12px;">🎉</div>
+      <h2>今日のタスク完了！</h2>
+      <p>毎日続けることが
